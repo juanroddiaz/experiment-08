@@ -14,6 +14,8 @@ public class ElevatorMotor : IElevatorMotor
 
     private int _secondsBetweenFloors = 1;
     private int _floorsAmount = 0;
+    private Task _currentTask;
+    private int _targetFloor;
 
     public ElevatorMotor(int floorsAmount, int currentFloor)
     {
@@ -30,39 +32,40 @@ public class ElevatorMotor : IElevatorMotor
             return;
         }
 
+        ReachedFloor = null;
         if (CurrentDirection != ElevatorDirection.Idle)
         {
-            // please wait ~ playing elevator music
+            _targetFloor = floor;
             return;
         }
 
-        _ = MoveToFloor(floor);
+        _currentTask = MoveToFloor(floor);
     }
 
     private async Task MoveToFloor(int targetFloor)
     {
-        if (targetFloor == CurrentFloor)
+        _targetFloor = targetFloor;
+        if (_targetFloor == CurrentFloor)
         {
             CurrentDirection = ElevatorDirection.Idle;
             return;
         }
 
-        int diff = targetFloor - CurrentFloor;
+        int diff = _targetFloor - CurrentFloor;
         int direction = Math.Sign(diff);
         CurrentDirection = direction > 0 ? ElevatorDirection.Up : ElevatorDirection.Down;
 
         await Task.Delay(_secondsBetweenFloors * 1000);
 
-        while (CurrentFloor != targetFloor)
+        while (CurrentFloor != _targetFloor)
         {
             await Task.Delay(_secondsBetweenFloors * 1000);
             CurrentFloor += direction;
-            Debug.Log("Going to " + targetFloor + ", current: " + CurrentFloor);
+            Debug.Log("Going to " + _targetFloor + ", current: " + CurrentFloor);
         }
 
+        CurrentDirection = ElevatorDirection.Idle;
         ReachedFloor?.Invoke(CurrentFloor);
-        ReachedFloor = null;
-        CurrentDirection = ElevatorDirection.Idle;        
         return;
     }
 }

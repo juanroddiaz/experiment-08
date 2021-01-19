@@ -11,7 +11,7 @@ public class ElevatorController : IElevatorController
     public event Action<int> ReachedDestinationFloor;
 
     private ElevatorMotor _motor;
-    private int _currentFloor = 0;
+    private int _targetFloor = 0;
     private List<int> _floorMemory = new List<int>();
 
     public bool IsWorking 
@@ -26,7 +26,7 @@ public class ElevatorController : IElevatorController
 
     public ElevatorController(int floorsAmount, Action<int> onReachedSummonedFloor, Action<int> onReachedDestinationFloor)
     {
-        _motor = new ElevatorMotor(floorsAmount, _currentFloor);
+        _motor = new ElevatorMotor(floorsAmount, _targetFloor);
         ReachedSummonedFloor = onReachedSummonedFloor;
         ReachedDestinationFloor = onReachedDestinationFloor;
     }
@@ -41,31 +41,61 @@ public class ElevatorController : IElevatorController
             return;
         }
 
-        Debug.Log("The elevator is going to your floor, be patient bitte.");
+        Debug.Log("The elevator is going to the " + floor + " floor, be patient bitte.");
         _isWorking = true;
+        _motor.GoToFloor(floor);
         _motor.ReachedFloor += ReachedSummonedFloor;
         _motor.ReachedFloor += OnReachedFloor;
-        _motor.GoToFloor(floor);
+
     }
 
     public void FloorButtonPushed(int floor)
     {
         if (_motor.CurrentDirection != ElevatorDirection.Idle)
         {
+            bool noMemory = true;
             // check if the button pushed is for a floor in the way of the current target
-            // _floorMemory
-            return;
+            if (_motor.CurrentDirection == ElevatorDirection.Down && floor > _targetFloor)
+            {
+                _floorMemory.Add(_targetFloor);
+                noMemory = false;
+            }
+
+            if (_motor.CurrentDirection == ElevatorDirection.Up && floor < _targetFloor)
+            {
+                _floorMemory.Add(_targetFloor);
+                noMemory = false;
+            }
+
+            if (noMemory)
+            {
+                return;
+            }            
         }
 
-        Debug.Log("Playing elevator music...");
+        _targetFloor = floor;
+
+        Debug.Log("Going to " + floor + " floor. Playing elevator music...");
         _isWorking = true;
+        _motor.GoToFloor(floor);
         _motor.ReachedFloor += ReachedDestinationFloor;
         _motor.ReachedFloor += OnReachedFloor;
-        _motor.GoToFloor(floor);
+        _motor.ReachedFloor += OnMemorizedFloor;
+
     }
 
     private void OnReachedFloor(int floor)
     {
         _isWorking = false;
+    }
+
+    private void OnMemorizedFloor(int floor)
+    {
+        if (_floorMemory.Count > 0)
+        {
+            int nextFloor = _floorMemory[0];
+            _floorMemory.RemoveAt(0);
+            FloorButtonPushed(nextFloor);
+        }
     }
 }

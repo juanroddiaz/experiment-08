@@ -46,7 +46,10 @@ public class Main : MonoBehaviour
         yield return new WaitUntil(() => { return !elevatorQuestion.IsWorking; });
         elevatorQuestion.SummonButtonPushed(5, ElevatorDirection.Down);
         yield return new WaitUntil(() => { return !elevatorQuestion.IsWorking; });
-        elevatorQuestion.FloorButtonPushed(1);
+        elevatorQuestion.FloorButtonPushed(0);
+        yield return new WaitForSeconds(0.5f);
+        Debug.Log("OMG you forgot something! Pressing Floor 3 to go back to your flat");
+        elevatorQuestion.FloorButtonPushed(3);
     }
 
     private void OnReachedSummonedFloor(int floor)
