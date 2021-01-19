@@ -53,7 +53,7 @@ public class RoomLogic : IPathable
 
     public bool PathExistsTo(string endingRoomName)    
     {
-        return _roomsHelper.FindIndex(r => string.Equals(r.GetName(),endingRoomName)) != -1;
+        return _roomsHelper.FindIndex(r => r != null && string.Equals(r.GetName(),endingRoomName)) != -1;
     }
 
     // 3b. Write a method to connect a new Room to an existing Room

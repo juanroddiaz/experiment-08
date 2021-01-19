@@ -35,12 +35,15 @@ public class MazeLogic
         }
     }
 
+    // - Each room has a unique name and can be connected to between zero and four other rooms through
+    //   doors named north, south, east, and west.
     // - Rooms are not necessarily spatially coherent.If A is north of B, B might not be south of A.
     // - Doors are not necessarily bidirectional. If A can be reached from B, B might not be reachable from A.
     // - Rooms might connect to themselves.
     private void CreateMazeConnection(RoomDirections direction, RoomLogic targetRoom)
     {
-        var connectedRoom = _maze[Random.Range(0, _maze.Count)];
+        // [JD] 25% of no connection with a room
+        var connectedRoom = Random.Range(0.0f, 1.0f) < 0.25f ? null : _maze[Random.Range(0, _maze.Count)];
         targetRoom.Connect(direction, connectedRoom);
     }
 
@@ -88,26 +91,33 @@ public class MazeLogic
             return true;
         }
 
-        var nextRoom = startRoom.GetConnection(RoomDirections.North);
-        if(CacheConnectedRoom(nextRoom.GetName(), RoomDirections.North.ToString()))
+        if (CheckRoomDirection(startRoom, RoomDirections.North, targetRoom))
         {
-            return CheckRoomConnections(nextRoom, targetRoom);
+            return true;
         }
 
-        nextRoom = startRoom.GetConnection(RoomDirections.South);
-        if (CacheConnectedRoom(nextRoom.GetName(), RoomDirections.South.ToString()))
+        if (CheckRoomDirection(startRoom, RoomDirections.South, targetRoom))
         {
-            return CheckRoomConnections(nextRoom, targetRoom);
+            return true;
         }
 
-        nextRoom = startRoom.GetConnection(RoomDirections.East);
-        if (CacheConnectedRoom(nextRoom.GetName(), RoomDirections.East.ToString()))
+        if (CheckRoomDirection(startRoom, RoomDirections.East, targetRoom))
         {
-            return CheckRoomConnections(nextRoom, targetRoom);
+            return true;
         }
 
-        nextRoom = startRoom.GetConnection(RoomDirections.West);
-        if (CacheConnectedRoom(nextRoom.GetName(), RoomDirections.West.ToString()))
+        if (CheckRoomDirection(startRoom, RoomDirections.West, targetRoom))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool CheckRoomDirection(RoomLogic startRoom, RoomDirections direction, string targetRoom)
+    {
+        var nextRoom = startRoom.GetConnection(direction);
+        if (nextRoom != null && CacheConnectedRoom(nextRoom.GetName(), direction.ToString()))
         {
             return CheckRoomConnections(nextRoom, targetRoom);
         }
