@@ -63,4 +63,9 @@ public class RoomLogic : IPathable
         //[JD] Avoiding using LINQ
         _roomsHelper = new List<RoomLogic>(_structure.RoomConnections.Values);
     }
+
+    public RoomLogic GetConnection(RoomDirections direction)
+    {
+        return _structure.RoomConnections[direction];
+    }
 }

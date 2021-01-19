@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-
-
     void Start()
     {
         // question 1
@@ -22,6 +20,12 @@ public class Main : MonoBehaviour
             OnTestNotPassed(2);
             return;
         }
+
+        var mazeQuestion3 = new MazeLogic();
+        mazeQuestion3.CreateMaze(8);
+        mazeQuestion3.AreConnectedRooms("Room_1", "Room_6");
+        mazeQuestion3.AreConnectedRooms("Room_0", "Room_7");
+        mazeQuestion3.AreConnectedRooms("Room_4", "Room_5");
 
         Debug.Log("Success!");
     }
