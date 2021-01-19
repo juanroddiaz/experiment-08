@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 
 //Write a method that modifies an input string, sorting the letters according to a sort order defined by
 //a second string. You may assume that every character in the input string also appears somewhere in
