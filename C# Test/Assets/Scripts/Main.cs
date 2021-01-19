@@ -16,6 +16,13 @@ public class Main : MonoBehaviour
             return;
         }
 
+        var question2 = new SortLettersLogic();
+        if (!question2.TestSortLetters())
+        {
+            OnTestNotPassed(2);
+            return;
+        }
+
         Debug.Log("Success!");
     }
 
