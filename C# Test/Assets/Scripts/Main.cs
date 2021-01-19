@@ -26,6 +26,9 @@ public class Main : MonoBehaviour
         mazeQuestion3.AreConnectedRooms("Room_1", "Room_6");
         mazeQuestion3.AreConnectedRooms("Room_0", "Room_7");
         mazeQuestion3.AreConnectedRooms("Room_4", "Room_5");
+        mazeQuestion3.CreateMaze(16);
+        mazeQuestion3.AreConnectedRooms("Room_5", "Room_10");
+        mazeQuestion3.AreConnectedRooms("Room_11", "Room_15");
 
         Debug.Log("Success!");
     }

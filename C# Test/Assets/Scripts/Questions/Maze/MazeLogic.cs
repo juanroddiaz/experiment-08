@@ -9,9 +9,11 @@ public class MazeLogic
 {
     private List<RoomLogic> _maze = new List<RoomLogic>();
     private List<string> _mazeSolverHelper = new List<string>();
+    private List<string> _mazeDirectionHelper = new List<string>();
 
     public void CreateMaze(int roomsAmount)
     {
+        _maze.Clear();
         string baseRoomName = "Room_";
         for (int i = 0; i < roomsAmount; i++)
         {
@@ -30,9 +32,8 @@ public class MazeLogic
             CreateMazeConnection(RoomDirections.South, r);
             CreateMazeConnection(RoomDirections.East, r);
             CreateMazeConnection(RoomDirections.West, r);
-        }        
+        }
     }
-
 
     // - Rooms are not necessarily spatially coherent.If A is north of B, B might not be south of A.
     // - Doors are not necessarily bidirectional. If A can be reached from B, B might not be reachable from A.
@@ -52,22 +53,31 @@ public class MazeLogic
         }
 
         _mazeSolverHelper.Clear();
+        _mazeDirectionHelper.Clear();
         _mazeSolverHelper.Add(start);
+        _mazeDirectionHelper.Add("Origin");
 
+        bool areConnected = false;
         if (CheckRoomConnections(startRoom, end))
         {
             _mazeSolverHelper.Add(end);
-            string roomConnection = "Rooms connected! ";
-            foreach (var s in _mazeSolverHelper)
-            {
-                roomConnection += s + ", ";
-            }
+            _mazeDirectionHelper.Add("End");
+            areConnected = true;
+        }
 
-            Debug.Log(roomConnection);
+        string roomConnection = "";
+        for(int i=0; i<_mazeSolverHelper.Count; i++)
+        {
+            roomConnection += _mazeSolverHelper[i] + " - " + _mazeDirectionHelper[i] + ", ";
+        }
+
+        if (areConnected)
+        {
+            Debug.Log("Rooms connected: " + roomConnection);
             return true;
         }
 
-        Debug.Log("Rooms not connected!");
+        Debug.Log("Rooms not connected: Tried " + roomConnection + " not reached: " + end);
         return false;
     }
 
@@ -79,25 +89,25 @@ public class MazeLogic
         }
 
         var nextRoom = startRoom.GetConnection(RoomDirections.North);
-        if(CacheConnectedRoom(nextRoom.GetName()))
+        if(CacheConnectedRoom(nextRoom.GetName(), RoomDirections.North.ToString()))
         {
             return CheckRoomConnections(nextRoom, targetRoom);
         }
 
         nextRoom = startRoom.GetConnection(RoomDirections.South);
-        if (CacheConnectedRoom(nextRoom.GetName()))
+        if (CacheConnectedRoom(nextRoom.GetName(), RoomDirections.South.ToString()))
         {
             return CheckRoomConnections(nextRoom, targetRoom);
         }
 
         nextRoom = startRoom.GetConnection(RoomDirections.East);
-        if (CacheConnectedRoom(nextRoom.GetName()))
+        if (CacheConnectedRoom(nextRoom.GetName(), RoomDirections.East.ToString()))
         {
             return CheckRoomConnections(nextRoom, targetRoom);
         }
 
         nextRoom = startRoom.GetConnection(RoomDirections.West);
-        if (CacheConnectedRoom(nextRoom.GetName()))
+        if (CacheConnectedRoom(nextRoom.GetName(), RoomDirections.West.ToString()))
         {
             return CheckRoomConnections(nextRoom, targetRoom);
         }
@@ -106,11 +116,12 @@ public class MazeLogic
     }
 
     // [JD] Returns true if it's a new room in the map
-    private bool CacheConnectedRoom(string nextRoomName)
+    private bool CacheConnectedRoom(string nextRoomName, string directionName)
     {
         if (!_mazeSolverHelper.Contains(nextRoomName))
         {
             _mazeSolverHelper.Add(nextRoomName);
+            _mazeDirectionHelper.Add(directionName);
             return true;
         }
 
